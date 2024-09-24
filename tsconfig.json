@@ -1,0 +1,15 @@
+{
+	"files": [],
+	"references": [
+		{
+			"path": "./tsconfig.app.json"
+		},
+		{
+			"path": "./tsconfig.node.json"
+		}
+	],
+	"compilerOptions": {
+		"noUnusedLocals": false, // Habilita advertencias para variables no usadas
+		"noUnusedParameters": false // Habilita advertencias para parámetros no usados (opcional)
+	}
+}
