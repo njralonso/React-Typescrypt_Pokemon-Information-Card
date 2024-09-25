@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react"
 
-const url = "https://pokeapi.co/api/v2/pokemon"
+const url = "https://pokeapi.co/api/v2/pokemon/"
 
 export function useFetchPokemon() {
-	const [pokemon, setPokemon] = useState()
+	const [pokemon, setPokemon] = useState([])
 	const [pokemonInfo, setPokemonInfo] = useState([])
 	const [pokemonInfoTypes, setPokemonInfoTypes] = useState([])
+	const [offset, setOffset] = useState(0)
 	const [error, setError] = useState()
 
 	// Fetch de la información principal
 	useEffect(() => {
 		const request = async () => {
 			try {
-				const response = await fetch(url)
+				const response = await fetch(`${url}?limit=10&offset=${offset}`)
 				if (response.ok) {
 					const data = await response.json()
-					setPokemon(data)
+					setPokemon((prev) => [...prev, data.results])
 
 					// Fetch de los detalles de cada Pokémon
 					const { results } = data
@@ -29,15 +30,22 @@ export function useFetchPokemon() {
 							}
 						})
 					)
-					setPokemonInfo(arrPokemonDetails)
+					setPokemonInfo((prev) => [...prev, ...arrPokemonDetails]); // Acumular detalles
 				}
 			} catch (error) {
 				// setError("Error en la primera llamada")
 			}
 		}
-
 		request()
-	}, [])
+	}, [offset])
+
+	const loadMorePokemons = () => {
+		setOffset((prevOffset) => prevOffset + 10); // Incrementar el offset en +10
+	};
+
+	const loadLessPokemons = () => {
+		setOffset((prevOffset) => (prevOffset >= 10 ? prevOffset - 10 : 0)); // Decrementar el offset en -10 sin bajar de 0
+	};
 
 	// Fetch de los tipos cuando pokemonInfo esté disponible
 	useEffect(() => {
@@ -77,5 +85,5 @@ export function useFetchPokemon() {
 		}
 	}, [pokemonInfo]) // Dependencia en pokemonInfo
 
-	return { pokemon, pokemonInfo, pokemonInfoTypes, error }
+	return { pokemon, pokemonInfo, pokemonInfoTypes, error, loadMorePokemons, loadLessPokemons }
 }
